@@ -2,8 +2,7 @@
 
 ![License](https://img.shields.io/badge/License-ISC-blue.svg)
 ![Node.js](https://img.shields.io/badge/Node.js-v18+-green)
-![Build](https://img.shields.io/badge/Build-Render-success)
-![Deployed on Render](https://img.shields.io/badge/Deployed_on-Render-blue)
+
 
 A sleek and responsive **Currency Converter** web application built with **Node.js** and **Express**, leveraging real-time exchange rates from the **European Central Bank (ECB)**. Easily convert between multiple currencies with country flags, symbols, and a smooth, interactive UI.
 
@@ -27,7 +26,6 @@ A sleek and responsive **Currency Converter** web application built with **Node.
 * **Backend:** Node.js, Express, XML2JS
 * **Frontend:** HTML, CSS, JavaScript
 * **API:** European Central Bank (ECB) reference rates
-* **Deployment:** Render / Railway
 
 ---
 
@@ -44,7 +42,7 @@ A sleek and responsive **Currency Converter** web application built with **Node.
 
 ## 🚀 Live Demo
 
-Check it out live: [Currency Converter on Render](https://currency-converter-h6r6.onrender.com/)
+Check it out live:
 
 ---
 
@@ -60,7 +58,7 @@ Check it out live: [Currency Converter on Render](https://currency-converter-h6r
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/Sagarika311/currency-converter.git
+git clone https://github.com/Gaurav22020/currency-converter.git
 ```
 
 2. Navigate to the project folder:
