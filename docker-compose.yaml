@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   nodeapp:
-    image: currency-map:2.0
+    image: currency-app:2.0
     ports:
       - "3000:3000"
     restart: unless-stopped
