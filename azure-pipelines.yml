@@ -1,0 +1,23 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  imageName: calculator-cal
+  tag: $(Build.BuildId)
+
+steps:
+- checkout: self
+
+- task: Docker@2
+  displayName: Build and push to Docker Hub
+  inputs:
+    command: buildAndPush
+    containerRegistry: dockerhub-connection
+    repository: gaurav22020/$(imageName)
+    dockerfile: Dockerfile
+    buildContext: .
+    tags: |
+      $(tag)
