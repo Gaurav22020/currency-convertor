@@ -7,8 +7,10 @@ variables:
   tag: $(Build.BuildId)
   containerAppName: containerapp
   resourceGroup: MyRegistry
+  azureSubscription: ServiceConnection   # EXACT NAME
 
 stages:
+# ---------------- BUILD & PUSH ----------------
 - stage: BuildPush
   displayName: Build and Push Image
   jobs:
@@ -28,9 +30,11 @@ stages:
         tags: |
           $(tag)
 
+# ---------------- DEPLOY ----------------
 - stage: Deploy
   displayName: Deploy to Azure Container App
   dependsOn: BuildPush
+  condition: succeeded()
   jobs:
   - job: Deploy
     pool:
@@ -39,11 +43,11 @@ stages:
     - task: AzureCLI@2
       displayName: Update Container App Image
       inputs:
-        azureSubscription: ServiceConnection
+        azureSubscription: $(azureSubscription)
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
           az containerapp update \
             --name $(containerAppName) \
             --resource-group $(resourceGroup) \
-            --image $(acrLoginServer)/$(imageName):$(tag)
+            --image $(acrLoginServer)/$(imageName):$(tag)S
