@@ -1,23 +1,49 @@
 trigger:
 - main
 
-pool:
-  vmImage: ubuntu-latest
-
 variables:
-  imageName: calculator-cal
+  acrLoginServer: registryapp.azurecr.io
+  imageName: myapp
   tag: $(Build.BuildId)
+  containerAppName: containerapp
+  resourceGroup: MyRegistry
 
-steps:
-- checkout: self
+stages:
+- stage: BuildPush
+  displayName: Build and Push Image
+  jobs:
+  - job: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - checkout: self
 
-- task: Docker@2
-  displayName: Build and push to Docker Hub
-  inputs:
-    command: buildAndPush
-    containerRegistry: dockerhub-connection
-    repository: gaurav22020/$(imageName)
-    dockerfile: Dockerfile
-    buildContext: .
-    tags: |
-      $(tag)
+    - task: Docker@2
+      displayName: Build and Push Image to ACR
+      inputs:
+        containerRegistry: acr-conn
+        repository: $(imageName)
+        command: buildAndPush
+        Dockerfile: Dockerfile
+        tags: |
+          $(tag)
+
+- stage: Deploy
+  displayName: Deploy to Azure Container App
+  dependsOn: BuildPush
+  jobs:
+  - job: Deploy
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: AzureCLI@2
+      displayName: Update Container App Image
+      inputs:
+        azureSubscription: ServiceConnection
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          az containerapp update \
+            --name $(containerAppName) \
+            --resource-group $(resourceGroup) \
+            --image $(acrLoginServer)/$(imageName):$(tag)
