@@ -1,20 +1,28 @@
-# 1. Use official Node image
-FROM node:18-alpine
+FROM node:18-alpine3.19
 
-# 2. Set working directory inside container
+# create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 WORKDIR /app
 
-# 3. Copy package.json and package-lock.json first (better caching)
+# install dependencies first (layer caching)
 COPY package*.json ./
 
-# 4. Install dependencies
-RUN npm install
+# install only production deps
+RUN npm ci --only=production && npm cache clean --force
 
-# 5. Copy the rest of the project files
+# copy app
 COPY . .
 
-# 6. Expose the port your app runs on (e.g., 3000)
+# update OS packages (security patches)
+RUN apk update && apk upgrade
+
+# change ownership
+RUN chown -R appuser:appgroup /app
+
+# switch to non-root user
+USER appuser
+
 EXPOSE 3000
 
-# 7. Start the application
-CMD ["npm", "start"]
+CMD ["node", "app.js"]
