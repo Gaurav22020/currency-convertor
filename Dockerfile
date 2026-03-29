@@ -1,19 +1,19 @@
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY . .
+
 FROM node:20-alpine
 
 WORKDIR /app
-
-# Update OS packages
 RUN apk update && apk upgrade --no-cache
 
-# Copy only dependency files first
-COPY package*.json ./
-
-# Clean install (deterministic)
-RUN npm ci --omit=dev
-
-# Now copy rest of code
-COPY . .
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/*.js ./
 
 EXPOSE 3000
-
 CMD ["npm", "start"]
