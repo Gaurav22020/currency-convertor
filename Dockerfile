@@ -1,28 +1,24 @@
-FROM node:18-alpine3.19
+# Use newer Node LTS
+FROM node:20-alpine
 
-# create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
+# Set working directory
 WORKDIR /app
 
-# install dependencies first (layer caching)
+# Copy only dependency files first
 COPY package*.json ./
 
-# install only production deps
-RUN npm ci --only=production && npm cache clean --force
+# Install only production dependencies
+RUN npm ci --omit=dev
 
-# copy app
+# Copy remaining files
 COPY . .
 
-# update OS packages (security patches)
-RUN apk update && apk upgrade
-
-# change ownership
-RUN chown -R appuser:appgroup /app
-
-# switch to non-root user
-USER appuser
-
+# Expose app port
 EXPOSE 3000
 
-CMD ["node", "app.js"]
+# Run as non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+# Start app
+CMD ["npm", "start"]
