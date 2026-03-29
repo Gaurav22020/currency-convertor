@@ -1,24 +1,19 @@
-# Use newer Node LTS
-FROM node:20-alpine
+FROM node:20-alpine AS builder
 
-# Set working directory
 WORKDIR /app
-
-# Copy only dependency files first
 COPY package*.json ./
+RUN npm ci
 
-# Install only production dependencies
-RUN npm ci --omit=dev
-
-# Copy remaining files
 COPY . .
 
-# Expose app port
+FROM node:20-alpine
+
+WORKDIR /app
+RUN apk update && apk upgrade --no-cache
+
+COPY --from=builder /app /app
+
+RUN npm prune --omit=dev
+
 EXPOSE 3000
-
-# Run as non-root user for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
-# Start app
 CMD ["npm", "start"]
